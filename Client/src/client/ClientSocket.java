@@ -16,7 +16,7 @@ public class ClientSocket {
         this.PORT = port;
     }
 
-    public boolean connectToServer(String username) {
+    public boolean connectToServer(String username, Runnable runnable) {
         try {
             this.username = username;
     
@@ -32,13 +32,25 @@ public class ClientSocket {
             // Send to server username
             streamToServer.println(username);
 
-            // this.accessThread = new Thread(runnable);
-            // this.accessThread.start();
+            this.accessThread = new Thread(runnable);
+            this.accessThread.start();
             return true;
 
         } catch (IOException | InterruptedException e) {
             System.err.println("Something went wrong while connecting to server!");
             return false;
         }
+    }
+
+    public String getUserName() {
+        return this.username;
+    }
+
+    public Thread getAccessThread() {
+        return this.accessThread;
+    }
+
+    public Socket getSocket() {
+        return this.socket;
     }
 }
