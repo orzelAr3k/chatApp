@@ -1,5 +1,7 @@
 package guis;
 
+import javax.swing.JList;
+
 public class MainChatPanel extends javax.swing.JPanel {
 
     private javax.swing.JScrollPane chatPane;
@@ -38,11 +40,10 @@ public class MainChatPanel extends javax.swing.JPanel {
 
         userList.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
         userList.setForeground(new java.awt.Color(102, 102, 102));
-        userList.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "User 1", "User 2", "User 3", "User 4", "User 5", "User 6", "User 7", "User 8", "User 9", "User 10", "User 11" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
+        // userList.setModel(new javax.swing.AbstractListModel<String>() {
+        //     public int getSize() { return MessageHandler.userList.size(); }
+        //     public String getElementAt(int i) { return MessageHandler.userList.get(i); }
+        // });
         userList.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         userList.setFixedCellHeight(40);
         userList.setPreferredSize(new java.awt.Dimension(45, 600));
@@ -94,5 +95,13 @@ public class MainChatPanel extends javax.swing.JPanel {
         );
 
         add(chatPanel);
+    }
+
+    public javax.swing.JList<String> getUserList() {
+        return this.userList;
+    }
+
+    public javax.swing.JList<String> getMessageList() {
+        return this.messagesList;
     }
 }

@@ -8,7 +8,7 @@ public class LoginPanel extends javax.swing.JPanel {
     private javax.swing.JButton exitButton;
     private javax.swing.JPanel formPanel;
     private javax.swing.JPanel leftPanel;
-    public javax.swing.JButton loginButton;
+    private javax.swing.JButton loginButton;
     private javax.swing.JTextField nameField;
     private javax.swing.JLabel nameLabel;
     private javax.swing.JTextField portField;
@@ -52,19 +52,19 @@ public class LoginPanel extends javax.swing.JPanel {
         loginButton.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         loginButton.setText("Login");
         loginButton.setPreferredSize(new java.awt.Dimension(120, 40));
-        loginButton.addActionListener(frame);
+        // loginButton.addActionListener(frame);
 
         formPanel.setLayout(new java.awt.GridLayout(3, 2, -200, 20));
 
-        adressLabel.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
-        adressLabel.setText("Address:");
-        formPanel.add(adressLabel);
-        formPanel.add(addressField);
+        // adressLabel.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
+        // adressLabel.setText("Address:");
+        // formPanel.add(adressLabel);
+        // formPanel.add(addressField);
 
-        portLabel.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
-        portLabel.setText("Port:");
-        formPanel.add(portLabel);
-        formPanel.add(portField);
+        // portLabel.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
+        // portLabel.setText("Port:");
+        // formPanel.add(portLabel);
+        // formPanel.add(portField);
 
         nameLabel.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
         nameLabel.setText("Name:");
@@ -99,4 +99,24 @@ public class LoginPanel extends javax.swing.JPanel {
 
         add(rightPanel);
     }  
+
+    public javax.swing.JButton getLoginJButton() {
+        return this.loginButton;
+    }
+
+    public javax.swing.JButton getExitButton() {
+        return this.exitButton;
+    }
+
+    // public String getAddressText() {
+    //     return this.addressField.getText();
+    // }
+
+    // public String getPortText() {
+    //     return this.portField.getText();
+    // }
+
+    public String getUserName() {
+        return this.nameField.getText();
+    }
 }
