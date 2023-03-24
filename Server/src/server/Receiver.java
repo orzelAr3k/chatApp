@@ -26,8 +26,28 @@ public class Receiver implements Runnable {
                 if (fromClient.hasNextLine()) {
                     JSONObject json = (JSONObject) new JSONParser().parse(fromClient.nextLine());
 
-                    // Send message
-                    this.sendMessage(json.toString(), this.client);
+                     // Set values
+                    String message = (String) json.get("message");
+                    String username = (String) json.get("username");
+                    String time = (String) json.get("time");
+                    // Send message to other user
+                    JSONObject jsonMessage = new JSONObject();
+                    if (username != null) {
+                        // Set vale for field message
+                        jsonMessage.put("message", message);
+                        jsonMessage.put("username", username);
+                        jsonMessage.put("time", time);
+                        jsonMessage.put("from", this.client.getUserName());
+                        this.sendMessage(jsonMessage.toString(), this.server.getClientByName(username));
+                    } else {
+                        // Set vale for field message
+                        jsonMessage.put("message", "Cannot send message!");
+                        jsonMessage.put("username", this.client.getUserName());
+                        jsonMessage.put("from", this.client.getUserName());
+                        jsonMessage.put("time", time);
+                        this.sendMessage(jsonMessage.toString(), this.client);
+                    }
+                   
                 }
             } 
         } catch (ParseException e) {

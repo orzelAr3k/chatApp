@@ -4,7 +4,6 @@ import javax.swing.JFrame;
 
 import client.ClientController;
 import client.ClientSocket;
-import client.MessageHandler;
 
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -15,10 +14,9 @@ public class MainFrame extends JFrame {
     private final ClientSocket clientSocket;
     private String username;
 
-
     private LoginPanel loginPanel;
     private MainChatPanel mainChatPanel;
-    
+
     public MainFrame(ClientSocket clientSocket) {
         this.clientSocket = clientSocket;
 
@@ -32,7 +30,6 @@ public class MainFrame extends JFrame {
         mainChatPanel.setVisible(false);
         add(loginPanel);
         loginPanel.setVisible(true);
-
 
         // Display the window.
         pack();
@@ -49,7 +46,7 @@ public class MainFrame extends JFrame {
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }
-            }          
+            }
         });
 
         this.loginPanel.getExitButton().addActionListener(new ActionListener() {
@@ -60,7 +57,8 @@ public class MainFrame extends JFrame {
                     ioException.printStackTrace();
                 }
             }
-        });;
+        });
+        ;
     }
 
     public void loginAction(ActionEvent e) throws IOException {
@@ -78,9 +76,9 @@ public class MainFrame extends JFrame {
 
     private void joinServer(ActionEvent e) throws IOException {
         ClientController clientController = new ClientController();
-        MessageHandler messageHandler = new MessageHandler(this.mainChatPanel.getMessageList(), this.mainChatPanel.getUserList());
         clientController.setUserSocket(clientSocket);
-        clientController.setMessaageHandler(messageHandler);
+        clientController.setMessageList(this.mainChatPanel.getMessageList());
+        clientController.setUserList(this.mainChatPanel.getUserList());
 
         // Wait till connected
         boolean connected = clientSocket.connectToServer(this.username, clientController);
@@ -88,7 +86,6 @@ public class MainFrame extends JFrame {
             // Open chat screen
             this.loginPanel.setVisible(false);
             this.mainChatPanel.setVisible(true);
-
 
         } else {
             // Show error popup

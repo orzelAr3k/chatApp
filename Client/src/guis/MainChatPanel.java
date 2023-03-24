@@ -55,12 +55,12 @@ public class MainChatPanel extends javax.swing.JPanel {
 
         messageField.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
         messageField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
-        messageField.setText("Message ...");
 
         sendButton.setFont(new java.awt.Font("Arial", 1, 24)); // NOI18N
         sendButton.setText("Send");
 
         messagesList.setFont(new java.awt.Font("Arial", 1, 24)); // NOI18N
+        messagesList.setEnabled(false);
         messagesList.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
             public int getSize() { return strings.length; }
