@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -56,7 +58,6 @@ public class ClientController implements Runnable {
                 public void valueChanged(ListSelectionEvent e) {
                     if (!e.getValueIsAdjusting()) {
                         selectedUser = userJList.getSelectedValue();
-                        System.out.println(selectedUser);
 
                         if (messagesList.get(selectedUser) == null)
                             messagesList.put(selectedUser, new ArrayList<Message>());
@@ -81,11 +82,14 @@ public class ClientController implements Runnable {
                 public void actionPerformed(ActionEvent e) {
                     // messageSend(e);
                     if (messageField.getText().length() >= 1) {
+                        LocalDateTime time = LocalDateTime.now();
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MM YYYY, HH:mm");
+
                         JSONObject json = new JSONObject();
                         json.put("from", clientSocket.getUserName());
                         json.put("username", selectedUser);
                         json.put("message", messageField.getText());
-                        json.put("time", TimeZone.getDefault().getID());
+                        json.put("time", time.format(formatter).toString());
                         serverOut.println(json.toString());
                         serverOut.flush();
 
@@ -174,7 +178,11 @@ public class ClientController implements Runnable {
                     if (username != null && message != null && time != null) {
                         if (messagesList.get(from) == null)
                             messagesList.put(from, new ArrayList<Message>());
-                        messagesList.get(from).add(new Message(username, message, time));
+
+                        if (from.equals(clientSocket.getUserName()))
+                            messagesList.get(username).add(new Message("You", message, time));
+                        else
+                            messagesList.get(from).add(new Message(username, message, time));
 
                         // // Update message list
                         messagesJList.setModel(new javax.swing.AbstractListModel<String>() {
@@ -184,7 +192,7 @@ public class ClientController implements Runnable {
 
                             public String getElementAt(int i) {
                                 Message element = messagesList.get(selectedUser).get(i);
-                                return "(" + element.getTime() + ")" + element.getUsername() + ": "
+                                return "(" + element.getTime() + ") " + element.getUsername() + ": "
                                         + element.getMessage();
                             }
                         });
