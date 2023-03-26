@@ -43,6 +43,7 @@ public class Server {
         while (!socketServer.isClosed()) {
             try {
                 Socket socket = socketServer.accept();
+
                 String username = (new Scanner(socket.getInputStream())).nextLine().replaceAll("\\s", "");
                 
                 // Create new client
@@ -64,6 +65,7 @@ public class Server {
 
                 this.broadcastClientList();
             } catch (IOException e) {
+                e.printStackTrace();
                 System.err.println("Failed accepting new user!");
             }
         }

@@ -79,6 +79,8 @@ public class MainFrame extends JFrame {
         clientController.setUserSocket(clientSocket);
         clientController.setMessageList(this.mainChatPanel.getMessageList());
         clientController.setUserList(this.mainChatPanel.getUserList());
+        clientController.setMessageField(this.mainChatPanel.getMessageField());
+        clientController.setSendButton(this.mainChatPanel.getSendButton());
 
         // Wait till connected
         boolean connected = clientSocket.connectToServer(this.username, clientController);

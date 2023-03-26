@@ -61,11 +61,6 @@ public class MainChatPanel extends javax.swing.JPanel {
 
         messagesList.setFont(new java.awt.Font("Arial", 1, 24)); // NOI18N
         messagesList.setEnabled(false);
-        messagesList.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
         chatPane.setViewportView(messagesList);
 
         javax.swing.GroupLayout chatPanelLayout = new javax.swing.GroupLayout(chatPanel);
@@ -103,5 +98,13 @@ public class MainChatPanel extends javax.swing.JPanel {
 
     public javax.swing.JList<String> getMessageList() {
         return this.messagesList;
+    }
+
+    public javax.swing.JTextField getMessageField() {
+        return this.messageField; 
+    }
+
+    public javax.swing.JButton getSendButton() {
+        return this.sendButton; 
     }
 }

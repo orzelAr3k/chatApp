@@ -20,13 +20,13 @@ public class Receiver implements Runnable {
     @Override
     public void run() {
         try {
-            Scanner fromClient = new Scanner(this.client.getInputStream());
+            Scanner fromClient = new Scanner(client.getInputStream());
 
-            while (!this.client.isSocketClosed()) {
+            while (!client.isSocketClosed()) {
                 if (fromClient.hasNextLine()) {
                     JSONObject json = (JSONObject) new JSONParser().parse(fromClient.nextLine());
-
                      // Set values
+                    System.out.println(json);
                     String message = (String) json.get("message");
                     String username = (String) json.get("username");
                     String time = (String) json.get("time");
@@ -49,7 +49,7 @@ public class Receiver implements Runnable {
                     }
                    
                 }
-            } 
+            }
         } catch (ParseException e) {
             e.printStackTrace();
         }
