@@ -10,12 +10,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -26,6 +24,9 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+
+import guis.custom.CustomMessageList;
+import guis.custom.CustomUserList;
 
 /**
  * The ClientController class is used to send and receive client-side messages
@@ -40,13 +41,12 @@ public class ClientController implements Runnable {
 
     public String selectedUser;
     public HashMap<String, ArrayList<Message>> messagesList = new HashMap<String, ArrayList<Message>>();
-    public List<String> userList = new ArrayList<String>();
 
     // UI
-    private JList<String> messagesJList;
-    private JList<String> userJList;
-    private JButton sendJButton;
-    private JTextField messageJField;
+    private CustomMessageList customMessageList;
+    private CustomUserList customUserList;
+    private JButton sendButton;
+    private JTextField messageField;
 
     @Override
     public void run() {
@@ -56,21 +56,21 @@ public class ClientController implements Runnable {
             InputStream serverInStream = socket.getInputStream();
             Scanner serverIn = new Scanner(serverInStream);
 
-            userJList.addListSelectionListener(new ListSelectionListener() {
+            customUserList.addListSelectionListener(new ListSelectionListener() {
                 @Override
                 public void valueChanged(ListSelectionEvent e) {
                     selectUser(e);
                 }
             });
 
-            messageJField.addActionListener(new ActionListener() {
+            messageField.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     messageSend(e, serverOut);
                 }
             });
 
-            sendJButton.addActionListener(new ActionListener() {
+            sendButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     messageSend(e, serverOut);
@@ -90,22 +90,6 @@ public class ClientController implements Runnable {
     }
 
     /**
-     * The updateUserList function updates the user list in the GUI.
-     * 
-     */
-    private void updateUserList() {
-        userJList.setModel(new javax.swing.AbstractListModel<String>() {
-            public int getSize() {
-                return userList.size();
-            }
-
-            public String getElementAt(int i) {
-                return userList.get(i);
-            }
-        });
-    }
-
-    /**
      * The updateMessageList function updates the JList of messages to display all
      * messages sent between the current user and a selected user. The function is
      * called whenever a new message is received or when a different user is
@@ -113,17 +97,21 @@ public class ClientController implements Runnable {
      *
      */
     private void updateMessageList() {
-        messagesJList.setModel(new javax.swing.AbstractListModel<String>() {
+        customMessageList.setModel(new javax.swing.AbstractListModel<Message>() {
             public int getSize() {
                 return messagesList.get(selectedUser).size();
             }
 
-            public String getElementAt(int i) {
-                Message element = messagesList.get(selectedUser).get(i);
-                return "(" + element.getTime() + ") " + element.getUsername() + ": "
-                        + element.getMessage();
+            public Message getElementAt(int i) {
+                return messagesList.get(selectedUser).get(i);
             }
         });
+
+        // Scroll to last message
+        int lastIndex = customMessageList.getModel().getSize() - 1;
+        if (lastIndex >= 0) {
+            customMessageList.ensureIndexIsVisible(lastIndex);
+        }
     }
 
     /**
@@ -137,13 +125,14 @@ public class ClientController implements Runnable {
      *
      */
     private void selectUser(ListSelectionEvent e) {
-        if (!e.getValueIsAdjusting()) {
-            selectedUser = userJList.getSelectedValue();
+        if (!e.getValueIsAdjusting() && customUserList.getSelectedValue() != null) {
+            selectedUser = customUserList.getSelectedValue().getUsername();
 
             if (messagesList.get(selectedUser) == null)
                 messagesList.put(selectedUser, new ArrayList<Message>());
             updateMessageList();
 
+            customUserList.setUserUnread(selectedUser, false);
         }
     }
 
@@ -159,7 +148,7 @@ public class ClientController implements Runnable {
      * 
      */
     private void messageSend(ActionEvent e, PrintWriter serverOut) {
-        if (messageJField.getText().length() >= 1 || !selectedUser.isEmpty()) {
+        if (messageField.getText().length() >= 1 && selectedUser != null) {
             // Get time and format
             LocalDateTime time = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.YYYY, HH:mm");
@@ -167,16 +156,16 @@ public class ClientController implements Runnable {
             JSONObject json = new JSONObject();
             json.put("from", clientSocket.getUserName());
             json.put("username", selectedUser);
-            json.put("message", messageJField.getText());
+            json.put("message", messageField.getText());
             json.put("time", time.format(formatter).toString());
             serverOut.println(json.toString());
             serverOut.flush();
 
-            messageJField.setText("");
-            messageJField.requestFocus();
+            messageField.setText("");
+            messageField.requestFocus();
         } else {
             // Show information dialog
-            JOptionPane.showMessageDialog(messagesJList, "Empty message or not selected user", "Warning",
+            JOptionPane.showMessageDialog(customMessageList, "Empty message or not selected user", "Warning",
                     JOptionPane.INFORMATION_MESSAGE);
         }
     }
@@ -203,37 +192,46 @@ public class ClientController implements Runnable {
                     String from = (String) json.get("from");
                     String time = (String) json.get("time");
 
-                    if (username != null && message != null && time != null) {
+                    if (username != null && message != null && time != null && from != null) {
                         if (messagesList.get(from) == null)
                             messagesList.put(from, new ArrayList<Message>());
 
-                        if (from.equals(clientSocket.getUserName()))
-                            messagesList.get(username).add(new Message("You", message, time));
-                        else
+                        if (from.equals(clientSocket.getUserName())) {
+                            messagesList.get(username).add(new Message(from, message, time));
+                        } else {
                             messagesList.get(from).add(new Message(from, message, time));
+                            // Set notification for new message
+                            if (selectedUser == null)
+                                customUserList.setUserUnread(from, true);
+                            else if (!selectedUser.equals(from))
+                                customUserList.setUserUnread(from, true);
+                        }
 
-                        // Update message list
-                        updateMessageList();
+                        // Update message list if selectedUser is not null
+                        if (selectedUser != null)
+                            updateMessageList();
 
                     }
 
                     JSONArray usersArray = (JSONArray) json.get("users");
                     if (usersArray != null) {
-                        userList = (List<String>) usersArray.stream().map(Object::toString)
-                                .collect(Collectors.toList());
-
-                        // Update user list
-                        updateUserList();
+                        for (Object u : usersArray) {
+                            // Update user list
+                            customUserList.addUserIfNotExists((String) u);
+                        }
                     }
 
-                    String usernameExit = (String) json.get("usernameExit");
-                    if (usernameExit != null) {
-                        // Remove user from user list
-                        userList.removeIf(u -> u.equals(usernameExit));
-                        messagesList.remove(usernameExit);
+                    String userExit = (String) json.get("userExit");
+                    if (userExit != null) {
+                        if (selectedUser != null && selectedUser.equals(userExit))
+                            customMessageList.setModel(new DefaultListModel<Message>());
 
-                        // Update user list
-                        updateUserList();
+                        // Deletes this user's messages
+                        messagesList.remove(userExit);
+
+                        // Remove user from list of users
+                        customUserList.removeUser(userExit);
+
                     }
 
                 } catch (ParseException e) {
@@ -255,44 +253,44 @@ public class ClientController implements Runnable {
     }
 
     /**
-     * The setUserList function is used to set the userJList parameter.
+     * The setUserList function is used to set the customUserList parameter.
      * 
-     * @param userJList Set the userjlist field of this class
+     * @param customUserList Set the customUserList field of this class
      *
      */
-    public void setUserList(JList<String> userJList) {
-        this.userJList = userJList;
+    public void setUserList(CustomUserList customUserList) {
+        this.customUserList = customUserList;
     }
 
     /**
-     * The setMessageList function sets the messagesJList variable.
+     * The setMessageList function sets the customMessageList variable.
      * 
-     * @param messagesJList Set the messagesjlist field of this class
+     * @param customMessageList Set the customMessageList field of this class
      *
      */
-    public void setMessageList(JList<String> messagesJList) {
-        this.messagesJList = messagesJList;
+    public void setMessageList(CustomMessageList customMessageList) {
+        this.customMessageList = customMessageList;
     }
 
     /**
-     * The setMessageField function sets the messageJField variable to the
+     * The setMessageField function sets the messageField variable to the
      * JTextField passed in as a parameter.
      * 
-     * @param messageJField Set the messagejfield field of this class
+     * @param messageField Set the messageField field of this class
      *
      */
-    public void setMessageField(JTextField messageJField) {
-        this.messageJField = messageJField;
+    public void setMessageField(JTextField messageField) {
+        this.messageField = messageField;
     }
 
     /**
-     * The setSendButton function sets the sendJButton variable to the JButton
+     * The setSendButton function sets the sendButton variable to the JButton
      * object passed in as a parameter.
      * 
-     * @param sendJButton Set the sendjbutton field of this class
+     * @param sendButton Set the sendButton field of this class
      *
      */
-    public void setSendButton(JButton sendJButton) {
-        this.sendJButton = sendJButton;
+    public void setSendButton(JButton sendButton) {
+        this.sendButton = sendButton;
     }
 }

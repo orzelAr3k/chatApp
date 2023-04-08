@@ -153,7 +153,7 @@ public class Server {
         clientList.removeIf(c -> c.getUserName().equals(username));
         JSONObject jsonMessage = new JSONObject(new HashMap<String, String>() {
             {
-                put("usernameExit", username);
+                put("userExit", username);
             }
         });
         broadcastMessage(jsonMessage);

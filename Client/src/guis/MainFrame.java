@@ -106,6 +106,7 @@ public class MainFrame extends JFrame {
             JOptionPane.showMessageDialog(loginPanel, "Enter the username!", "WARNING", JOptionPane.WARNING_MESSAGE);
             System.out.println("Error username");
         } else {
+            mainChatPanel.getMessageList().setCurrentUser(username);
             joinServer(e);
         }
     }

@@ -89,14 +89,35 @@ public class LoginPanel extends javax.swing.JPanel {
         add(rightPanel);
     }
 
+    
+    /**
+     * The getLoginJButton function returns the loginButton object.
+     *
+     * @return The loginbutton object
+     *
+     */
     public javax.swing.JButton getLoginJButton() {
         return this.loginButton;
     }
 
+    
+    /**
+     * The getExitButton function returns the exitButton object.
+     *
+     * @return The exitbutton variable
+     *
+     */
     public javax.swing.JButton getExitButton() {
         return this.exitButton;
     }
 
+    
+    /**
+     * The getUsernameField function returns the username field.
+     *
+     * @return The username field
+     *
+     */
     public javax.swing.JTextField getUsernameField() {
         return this.nameField;
     }

@@ -35,7 +35,7 @@ class IMessage {
      * @param username Set the username variable
      *
      */
-    void setUsername(String username) { this.username = username; }
+    public void setUsername(String username) { this.username = username; }
     
     /**
      * The getUsername function returns the username field.
@@ -43,7 +43,7 @@ class IMessage {
      * @return The username of the user
      *
      */
-    String getUsername() { return this.username; }
+    public String getUsername() { return this.username; }
 
     
     /**
@@ -52,7 +52,7 @@ class IMessage {
      * @param message Set the message field
      *
      */
-    void setMessage(String message) { this.message = message; }
+    public void setMessage(String message) { this.message = message; }
     
 
     
@@ -62,7 +62,7 @@ class IMessage {
      * @return The value of the message
      *
      */
-    String getMessage() { return this.message; }
+    public String getMessage() { return this.message; }
 
     
     /**
@@ -71,7 +71,7 @@ class IMessage {
      * @param time Set the time
      *
      */
-    void setTime(String time) { this.time = time; }
+    public void setTime(String time) { this.time = time; }
     
     /**
      * The getTime function returns the time field.
@@ -79,7 +79,7 @@ class IMessage {
      * @return The time value
      *
      */
-    String getTime() { return this.time; }
+    public String getTime() { return this.time; }
 
 
 }
